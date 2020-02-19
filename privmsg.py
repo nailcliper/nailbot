@@ -115,11 +115,13 @@ def handle_PRIVMSG(s, data):
                 s.msg(channel,msg)
     #end if
     
-    if "sudoku" in data['message'] and channel == "#chewiemelodies":
-        if 'moderator' not in data['tags']['badges'] and 'broadcaster' not in data['tags']['badges']:
-            pass
-            
-    elif "yuuki mod" in data['message'] and userlevel <= 3:
+    if "sudoku" in ' '.join(data['message']).lower() and channel == "#chewiemelodies":
+        if all (k not in data['tags']['badges'] for k in ("moderator","broadcaster","staff","admin","global_mod")):
+            s.msg(channel,"/timeout "+username+" 120")
+            s.msg(channel,"! chewieSudoku "+username+" got their guts spilled! chewieSudoku")
+        #end if
+    
+    elif "yuuki mod" in ' '.join(data['message']).lower() and userlevel <= 3:
         s.msg(channel,"WutFace")
     
     if command == "!count" and data['message'][1]:
@@ -133,7 +135,7 @@ def handle_PRIVMSG(s, data):
             s.msg(channel, msg)
     #end  if
     
-    if command == "!countadd" and data['message'][1] and userlevel <= 3:
+    elif command == "!countadd" and data['message'][1] and userlevel <= 3:
         key = "count_"+data['message'][1]
         if key in variables:
             variables[key] = str(int(variables[key])+1)
@@ -152,7 +154,7 @@ def handle_PRIVMSG(s, data):
         s.msg(channel, variables[key])
     #end if
     
-    if command == "!countsub" and data['message'][1] and userlevel <= 3:
+    elif command == "!countsub" and data['message'][1] and userlevel <= 3:
         key = "count_"+data['message'][1]
         if key in variables:
             variables[key] = str(int(variables[key])-1)
@@ -164,7 +166,7 @@ def handle_PRIVMSG(s, data):
             s.msg(channel, variables[key])
     #end if
     
-    if command == "!timer" and userlevel <= 2:
+    elif command == "!timer" and userlevel <= 2:
         if channel in timers and timers[channel].running:
             if len(data['message']) >= 2 and data['message'][1] == "stop":
                 timers[channel].timer.cancel()
@@ -217,5 +219,9 @@ def handle_PRIVMSG(s, data):
             s.msg(channel, msg)
         #end if
     #end if
+    
+    elif command == "!subcount" and userlevel <= 2:
+        pass
+    #end def
     
 #end def
