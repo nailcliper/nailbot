@@ -1,6 +1,3 @@
-from globals import NICK, channel_info, variables
-import random
-
 #data['tags']:
 #badge-Info:    Metadata related to the chat badges in the 'badges' tag.
 #               Currently only used for 'subscriber' to indicate the exact number of months the user has been a subscriber
@@ -42,6 +39,20 @@ import random
 
 #data['message']:   <message>
 
+from globals import NICK, channel_info, variables
+import random
+import threading
+from threading import Timer
+import time
+
+timers = {}
+class ChannelTimer():
+    timer = None
+    set_time = None
+    start_time = None
+    running = False
+#end class
+
 def get_username(data):
     if len(data['tags']['display-name']) > 0:
         return data['tags']['display-name']
@@ -81,10 +92,15 @@ def get_userlevel(username, data):
     return level
 #end def
 
+def timeup(s,channel,message):
+    s.msg(channel,message)
+    timers[channel].running = False
+
 def handle_PRIVMSG(s, data):
     username = get_username(data)
     userlevel = get_userlevel(username, data)
     channel = data['args'][0]
+    command = data['message'][0]
     print(username,":",userlevel)
     
     if "bits" in data:
@@ -106,13 +122,18 @@ def handle_PRIVMSG(s, data):
     elif "yuuki mod" in data['message'] and userlevel <= 3:
         s.msg(channel,"WutFace")
     
-    if data['message'][0] == "!count" and data['message'][1]:
+    if command == "!count" and data['message'][1]:
         key = "count_"+data['message'][1]
         if key in variables:
-            s.msg(channel, variables[key])
+            msg = variables[key]
+            if key == "river":
+                msg = "River has flowed "+msg+" times chewieRiver"
+            elif key == "nier":
+                msg = "The Weight of the World is "+msg+" tons of android bodies chewieHuh"
+            s.msg(channel, msg)
     #end  if
     
-    if data['message'][0] == "!countadd" and data['message'][1] and userlevel <= 2:
+    if command == "!countadd" and data['message'][1] and userlevel <= 3:
         key = "count_"+data['message'][1]
         if key in variables:
             variables[key] = str(int(variables[key])+1)
@@ -123,10 +144,15 @@ def handle_PRIVMSG(s, data):
                 f.write(v+" "+variables[v]+'\n')
             f.close()
         #end open
+        msg = variables[key]
+        if key == "river":
+            msg += " chewieRiver"
+        elif key == "nier":
+            msg += " chewieHuh"
         s.msg(channel, variables[key])
     #end if
     
-    if data['message'][0] == "!countsub" and data['message'][1] and userlevel <= 2:
+    if command == "!countsub" and data['message'][1] and userlevel <= 3:
         key = "count_"+data['message'][1]
         if key in variables:
             variables[key] = str(int(variables[key])-1)
@@ -136,6 +162,60 @@ def handle_PRIVMSG(s, data):
                 f.close()
             #end open
             s.msg(channel, variables[key])
+    #end if
+    
+    if command == "!timer" and userlevel <= 2:
+        if channel in timers and timers[channel].running:
+            if len(data['message']) >= 2 and data['message'][1] == "stop":
+                timers[channel].timer.cancel()
+                timers[channel].running = False
+                s.msg(channel,"Timer Stopped")
+            else:
+                elapsed_time = int(timers[channel].set_time - (time.time() - timers[channel].start_time))
+                seconds = elapsed_time % 60
+                elapsed_time = elapsed_time // 60
+                minutes = elapsed_time % 60
+                hours = elapsed_time // 60
+                
+                msg = "Remaining Time: "
+                if(hours):
+                    msg += str(hours)+"h "+str(minutes)+"m "+str(seconds)+"s"
+                elif(minutes):
+                    msg += str(minutes)+"m "+str(seconds)+"s"
+                else:
+                    msg += str(seconds)+"s"
+                s.msg(channel, msg)
+            #end if
+        elif len(data['message']) >= 2 and data['message'][1].isnumeric() :
+            set_time = int(data['message'][1])
+            if len(data['message']) >= 3:
+                if data['message'][2] == 'm':
+                    set_time *= 60
+                elif data['message'][2] == 'h':
+                    set_time *= 3600
+            #end if
+            msg = "BongoPenguin Time Up! BongoPenguin"
+            timers[channel] = ChannelTimer()
+            timers[channel].timer = Timer(set_time,timeup,(s,channel,msg))
+            timers[channel].timer.start()
+            timers[channel].start_time = time.time()
+            timers[channel].set_time = set_time
+            timers[channel].running = True
+            
+            seconds = set_time % 60
+            set_time = set_time // 60
+            minutes = set_time % 60
+            hours = set_time // 60
+            
+            msg = "Timer started for: "
+            if(hours):
+                msg += str(hours)+"h "+str(minutes)+"m "+str(seconds)+"s"
+            elif(minutes):
+                msg += str(minutes)+"m "+str(seconds)+"s"
+            else:
+                msg += str(seconds)+"s"
+            s.msg(channel, msg)
+        #end if
     #end if
     
 #end def
