@@ -2,7 +2,7 @@ from globals import channel_info
 
 def handle_NAMES(s, data):
     channel = data['args'][2]
-    names  = data['message'].split()
+    names  = data['message']
     for n in names:
         if n not in channel_info[channel]['users']:
             channel_info[channel]['users'].add(n)

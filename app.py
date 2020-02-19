@@ -50,6 +50,7 @@ def parseData(line):
     while lines:
         message += ' ' + lines.pop(0)
     data['message'] = message[2:]
+    data['message'] = data['message'].split()
     
     return data
 #end def

@@ -1,0 +1,3 @@
+count_river 625
+count_nier 32
+count_poop 1

@@ -1,4 +1,4 @@
-from globals import NICK, channel_info
+from globals import NICK, channel_info, variables
 import random
 
 #data['tags']:
@@ -57,7 +57,7 @@ def get_username(data):
 #5 - Restricted
 #6 - Banned
 userlevels = {}
-with open("userlevels.txt") as f:
+with open("userlevels.txt",'r') as f:
     for line in f:
         (key, val) = line.split()
         userlevels[key] = val
@@ -105,5 +105,37 @@ def handle_PRIVMSG(s, data):
             
     elif "yuuki mod" in data['message'] and userlevel <= 3:
         s.msg(channel,"WutFace")
+    
+    if data['message'][0] == "!count" and data['message'][1]:
+        key = "count_"+data['message'][1]
+        if key in variables:
+            s.msg(channel, variables[key])
+    #end  if
+    
+    if data['message'][0] == "!countadd" and data['message'][1] and userlevel <= 2:
+        key = "count_"+data['message'][1]
+        if key in variables:
+            variables[key] = str(int(variables[key])+1)
+        else:
+            variables[key] = "1"
+        with open("variables.txt",'w') as f:
+            for v in variables:
+                f.write(v+" "+variables[v]+'\n')
+            f.close()
+        #end open
+        s.msg(channel, variables[key])
+    #end if
+    
+    if data['message'][0] == "!countsub" and data['message'][1] and userlevel <= 2:
+        key = "count_"+data['message'][1]
+        if key in variables:
+            variables[key] = str(int(variables[key])-1)
+            with open("variables.txt",'w') as f:
+                for v in variables:
+                    f.write(v+" "+variables[v]+'\n')
+                f.close()
+            #end open
+            s.msg(channel, variables[key])
+    #end if
     
 #end def
