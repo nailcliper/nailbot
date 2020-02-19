@@ -1,8 +1,11 @@
 from twitch_socket import s
-from globals import HOST, PORT, NICK, PASS, CHAN, RECV_QUEUE
+from globals import NICK, PASS, CHAN
 from notice import handle_NOTICE
 from privmsg import handle_PRIVMSG
 from usernotice import handle_USERNOTICE
+from join import handle_JOIN
+from part import handle_PART
+from names import handle_NAMES
 
 def parseData(line):
     data = {}
@@ -15,6 +18,15 @@ def parseData(line):
         for tag in temp:
             kv = tag.split('=')
             tags[kv[0]] = kv[1]
+            if (kv[0] == 'badge-info' or kv[0] == 'badges') and kv[1]:
+                badges = {}
+                infos = kv[1].split(',')
+                for info in infos:
+                    badge_kv = info.split('/')
+                    badges[badge_kv[0]] = badge_kv[1]
+                tags[kv[0]] = badges
+            #end if
+        #end for
     #end if
     data['tags'] = tags
     
@@ -49,15 +61,21 @@ def processData(data):
     
     #Twitch IRC: Membership
     #JOIN: Join a specified chat room in a channel
+    elif command == "JOIN":
+        handle_JOIN(s, data)
     
     #MODE: Gain/lose moderator status in a channel
     
     #NAMES: List current chatters in a channel
+    elif command == "353":
+        handle_NAMES(s,data)
     
     #PART: Depart from a channel
+    elif command == "PART":
+        handle_PART(s,data)
     
     #Twitch IRC: Commands:
-    #CLEARCHAT: Purgeg a user's message(s), typically after a user is banned from chat or timed out
+    #CLEARCHAT: Purges a user's message(s), typically after a user is banned from chat or timed out
     
     #CLEARMSG: Single message removal on a channel. This is triggered via /delete <target-msg-ig> on IRC
     
@@ -65,7 +83,7 @@ def processData(data):
    
     #NOTICE: General notices from the server
     elif command == "NOTICE":
-        handle_NOTICE(data)
+        handle_NOTICE(s, data)
     
     #RECONNECT: Rejoin channels after a restart
     
@@ -73,7 +91,7 @@ def processData(data):
     
     #USERNOTICE: Announces Twitch-specific events to the channel (e.g. subscription notification)
     elif command == "USERNOTICE":
-        handle_USERNOTICE(data)
+        handle_USERNOTICE(s, data)
     
     #USERSTATE: Identifies a user's chat settings or properties (e.g. chat color)
     
@@ -82,29 +100,27 @@ def processData(data):
     
     #PRIVMSG: Send a message to a channel
     elif command == "PRIVMSG":
-        handle_PRIVMSG(data)
+        handle_PRIVMSG(s, data)
     
     
     #PING: The server will send you a PING :tmi.twitch.tv. 
     #      To ensure that your connection to the server is not prematurely terminated, reply with PONG :tmi.twitch.tv.
     elif command == "PING":
         s.send("PONG :tmi.twitch.tv")
+
 #end def
 
-s.connect(HOST,PORT)
-s.send("PASS " + PASS)
-s.send("NICK " + NICK)
-s.send("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
-s.join_channel(CHAN)
+s.connect()
 
 while True:
-    while(len(RECV_QUEUE) > 0):
-        lines = RECV_QUEUE.pop().split('\r\n')
+    while(len(s.RECV_QUEUE) > 0):
+        lines = s.RECV_QUEUE.pop().split('\r\n')
         for line in lines:
             if len(line) > 0:
-                print("<- " + line)
                 data = {}
                 data = parseData(line)
+                #if(data['command'] != "JOIN" and data['command'] != "PART"):
+                print("<- " + line)
                 print("Data: \n",data,'\n')
                 
                 processData(data)
