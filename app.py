@@ -6,6 +6,7 @@ from usernotice import handle_USERNOTICE
 from join import handle_JOIN
 from part import handle_PART
 from names import handle_NAMES
+from hosttarget import handle_HOSTTARGET
 
 def parseData(line):
     data = {}
@@ -81,7 +82,8 @@ def processData(data):
     #CLEARMSG: Single message removal on a channel. This is triggered via /delete <target-msg-ig> on IRC
     
     #HOSTTARGET: Channel starts or stops host mode
-   
+    elif command == "HOSTTARGET":
+        handle_HOSTTARGET(s, data)
     #NOTICE: General notices from the server
     elif command == "NOTICE":
         handle_NOTICE(s, data)

@@ -79,8 +79,8 @@ def get_userlevel(username, data):
     badges = data['tags']['badges']
     if username == NICK:
         level = 0
-    elif username in userlevels:
-        level = userlevels[username]
+    elif username.lower() in userlevels:
+        level = userlevels[username.lower()]
     elif 'broadcaster' in badges:
         level = 1
     elif 'moderator' in badges:
@@ -218,6 +218,23 @@ def handle_PRIVMSG(s, data):
                 msg += str(seconds)+"s"
             s.msg(channel, msg)
         #end if
+    #end if
+    
+    elif command == "!host" and userlevel <= 5 and channel_info[channel]['hosttarget']:
+        msg = ''
+        if len(data['message']) >= 2 and userlevel <= 3:
+            if data['message'][1][0] == '@':
+                msg += data['message'][1]
+        #end if
+        if channel == "#itshafu":
+            msg += "This is still Hafu's chat, to talk to " + channel_info[channel]['hosttarget'] + " please visit twitch.tv/" + channel_info[channel]['hosttarget'] + " omgLurk"
+        elif channel == "#chewiemelodies":
+            msg += "This is still Chewie's chat, to talk to " + channel_info[channel]['hosttarget'] + " please visit twitch.tv/" + channel_info[channel]['hosttarget'] + " chewieLove"
+        else:
+            msg = ''
+        #end if
+        if msg:
+            s.msg(channel, msg)
     #end if
     
     elif command == "!subcount" and userlevel <= 2:
