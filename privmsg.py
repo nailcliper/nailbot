@@ -111,7 +111,7 @@ def handle_PRIVMSG(s, data):
                 s.msg(channel,msg)
             else:
                 msg = "!add "+str(chews)+" "+username
-                s.msg(channel,msg)
+                s.msg("#chewiebot",msg)
     #end if
     
     if username == "rallyboss" and data['message'][1] == "Boss" and data['message'][2] == "defeated!" and channel == "#chewiemelodies":

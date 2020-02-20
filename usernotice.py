@@ -89,6 +89,8 @@ def handle_USERNOTICE(s, data):
             else:
                 msg = ''
                 if months > 1:
+                    chews = (months * 1000) - 15000
+                    s.msg("#chewiebot", "!add "+str(chews) + " gift")
                     if m == 0:
                         msg = "chewieRem " + "chewieLove "*y + "chewieXD"
                     else:
