@@ -39,7 +39,7 @@
 
 #data['message']:   <message>
 
-from globals import NICK, channel_info, variables
+from globals import NICK, channels, variables
 import random
 import threading
 from threading import Timer
@@ -107,7 +107,7 @@ def handle_PRIVMSG(s, data):
         if channel == "#chewiemelodies":
             chews = int(data['bits']) * 10
             if username == "ananonymouscheerer":
-                winner = random.choice(channel_info["#chewiemelodies"]['users'])
+                winner = random.choice(channels[channel].userlist)
                 msg = "!add "+str(chews)+" "+winner
                 s.msg(channel,msg)
             else:
@@ -220,16 +220,16 @@ def handle_PRIVMSG(s, data):
         #end if
     #end if
     
-    elif command == "!host" and userlevel <= 5 and channel_info[channel]['hosttarget']:
+    elif command == "!host" and userlevel <= 5 and channels[channel].hosttarget:
         msg = ''
         if len(data['message']) >= 2 and userlevel <= 3:
             if data['message'][1][0] == '@':
                 msg += data['message'][1]
         #end if
         if channel == "#itshafu":
-            msg += "This is still Hafu's chat, to talk to " + channel_info[channel]['hosttarget'] + " please visit twitch.tv/" + channel_info[channel]['hosttarget'] + " omgLurk"
+            msg += "This is still Hafu's chat, to talk to " + channels[channel].hosttarget + " please visit twitch.tv/" + channels[channel].hosttarget + " omgLurk"
         elif channel == "#chewiemelodies":
-            msg += "This is still Chewie's chat, to talk to " + channel_info[channel]['hosttarget'] + " please visit twitch.tv/" + channel_info[channel]['hosttarget'] + " chewieLove"
+            msg += "This is still Chewie's chat, to talk to " + channels[channel].hosttarget + " please visit twitch.tv/" + channels[channel].hosttarget + " chewieLove"
         else:
             msg = ''
         #end if
@@ -238,7 +238,19 @@ def handle_PRIVMSG(s, data):
     #end if
     
     elif command == "!subcount" and userlevel <= 2:
-        pass
+        subcount = channels[channel].subcount
+        if channel == "#itshafu":
+            msg = "Today's Pingus: " + str(subcount)
+            if subcount >= 100:
+                msg += " MetPride"
+            elif subcount == 69:
+                msg += " ( ͡° ͜ʖ ͡°)"
+            elif subcount >= 1:
+                msg += " omgHost"
+            else:
+                msg += " FeelsBadMan"
+            s.msg(channel, msg)
+        #end if
     #end def
     
 #end def

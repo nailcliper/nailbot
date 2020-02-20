@@ -1,10 +1,11 @@
-from globals import channel_info
+from globals import channels
 
 def handle_HOSTTARGET(s, data):
     channel = data['args'][0]
     target = data['message'][0]
     if target == "-":
-        channel_info[channel]['hosttarget'] = None
+        channels[channel].hosttarget = None
+        channels[channel].subcount = 0
     else:
-        channel_info[channel]['hosttarget'] = target
+        channels[channel].hosttarget = target
 #end def

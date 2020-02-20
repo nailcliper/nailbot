@@ -1,10 +1,10 @@
-from globals import channel_info
+from globals import channels
 
 def handle_NAMES(s, data):
     channel = data['args'][2]
     names  = data['message']
     for n in names:
-        if n not in channel_info[channel]['users']:
-            channel_info[channel]['users'].add(n)
+        if n not in channels[channel].userlist:
+            channels[channel].userlist.add(n)
     #end for
 #end def

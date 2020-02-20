@@ -1,6 +1,6 @@
 import socket
 import threading
-from globals import NICK, PASS, CHAN, channel_info
+from globals import NICK, PASS, CHAN, channels, Channel
 
 class Socket:
     def __init__(self):
@@ -70,11 +70,9 @@ class Socket:
         m = "PRIVMSG " + channel + " :" + message
         self.SEND_QUEUE.append(m)
 
-    def join_channel(self,  channel):
+    def join_channel(self, channel):
         m = "JOIN " + channel
-        channel_info[channel] = {}
-        channel_info[channel]['hosttarget'] = ''
-        channel_info[channel]['users'] = set()
+        channels[channel] = Channel()
         self.SEND_QUEUE.append(m)
 #end class
 
