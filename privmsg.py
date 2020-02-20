@@ -44,6 +44,9 @@ import random
 import threading
 from threading import Timer
 import time
+import re
+
+regex = re.compile('[W_]+')
 
 timers = {}
 class ChannelTimer():
@@ -117,11 +120,12 @@ def handle_PRIVMSG(s, data):
     if username == "rallyboss" and data['message'][1] == "Boss" and data['message'][2] == "defeated!" and channel == "#chewiemelodies":
         s.msg(channel, "!add 5000 "+data['message'][18])
     
-    if "sudoku" in ' '.join(data['message']).lower() and channel == "#chewiemelodies":
+    text = re.sub(regex,'',''.join(data['message']).lower())
+    if "sudoku" in text and channel == "#chewiemelodies":
         if all (k not in data['tags']['badges'] for k in ("moderator","broadcaster","staff","admin","global_mod")):
             s.msg(channel,"/timeout "+username+" 120")
             s.msg(channel,"! chewieSudoku "+username+" got their guts spilled! chewieSudoku")
-        #end if
+    #end if
     
     elif "yuuki mod" in ' '.join(data['message']).lower() and userlevel <= 3:
         s.msg(channel,"WutFace")

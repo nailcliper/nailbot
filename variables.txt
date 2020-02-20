@@ -1,3 +1,14 @@
 count_river 625
 count_nier 32
-count_poop 1
+count_despacito 14
+count_shark 48
+count_faded 5
+count_meow 3
+count_baby 8
+count_rick 5
+count_rafa 1
+count_counts 3
+count_chews 1
+count_canon 1
+count_ddlc 1
+count_ttls 1

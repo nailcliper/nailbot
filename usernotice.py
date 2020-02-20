@@ -36,20 +36,20 @@ def get_chewieSubMessage(months,m,y):
 #end def
 
 def handle_USERNOTICE(s, data):
-    channel = data['channel']
+    channel = data['args'][0]
     
     key = data['tags']['msg-id']
     months = data['tags']['msg-param-cumulative-months']
     username = data['tags']['login']
     plan = data['tags']['msg-param-sub-plan']
     gift = data['tags']['msg-param-recipient-user-name'] if 'msg-param-recipient-user-name' in data['tags'] else None
-    giftcount = data['tags']['msg-param-mass-gift-count'] if 'msg-param-mass-gift-count' in data['tags'] else None
+    giftcount = data['tags']['msg-param-mass-gift-count'] if 'msg-param-mass-gift-count' in data['tags'] else 0
     
     m = months % 12
     y = months // 12
     
     if channel == "#itshafu":
-        if key == "submysterygift" and giftcount:
+        if key == "submysterygift" and giftcount > 1:
             if channels[channel].subbuffer > 0:
                 s.msg(channel, "MetPride DanceBro BongoPenguin MetPride")
             channels[channel].subbuffer += giftcount
@@ -74,7 +74,7 @@ def handle_USERNOTICE(s, data):
         #end if
         
     elif channel == "#chewiemelodies":
-        if key == "submysterygift" and giftcount:
+        if key == "submysterygift" and giftcount > 1:
             if channels[channel].subbuffer > 0:
                 s.msg(channel, "HyperNeko HyperNeko HyperNeko HyperNeko")
             channels[channel].subbuffer += giftcount
