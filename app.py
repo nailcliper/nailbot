@@ -50,8 +50,11 @@ def parseData(line):
     message = ''
     while lines:
         message += ' ' + lines.pop(0)
-    data['message'] = message[2:]
-    data['message'] = data['message'].split()
+    message = message[2:]
+    print(message[:7])
+    if message[:7] == "ACTION":
+        message = message[7:-1]
+    data['message'] = message.split()
     
     return data
 #end def

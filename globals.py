@@ -4,7 +4,15 @@ NICK = ""
 PASS = ""
 CHAN = [""]
 
-channel_info = {}
+channels = {}
+class Channel:
+    hosttarget = None
+    selfsub = False
+    subbuffer = 0
+    subcount = 0
+    userlist = set()
+#end class
+
 variables = {}
 with open("variables.txt") as f:
     for line in f:

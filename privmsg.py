@@ -100,8 +100,7 @@ def handle_PRIVMSG(s, data):
     username = get_username(data)
     userlevel = get_userlevel(username, data)
     channel = data['args'][0]
-    command = data['message'][0]
-    print(username,":",userlevel)
+    command = data['message'][0] 
     
     if "bits" in data:
         if channel == "#chewiemelodies":
@@ -114,6 +113,9 @@ def handle_PRIVMSG(s, data):
                 msg = "!add "+str(chews)+" "+username
                 s.msg(channel,msg)
     #end if
+    
+    if username == "rallyboss" and data['message'][1] == "Boss" and data['message'][2] == "defeated!" and channel == "#chewiemelodies":
+        s.msg(channel, "!add 5000 "+data['message'][18])
     
     if "sudoku" in ' '.join(data['message']).lower() and channel == "#chewiemelodies":
         if all (k not in data['tags']['badges'] for k in ("moderator","broadcaster","staff","admin","global_mod")):
@@ -253,4 +255,64 @@ def handle_PRIVMSG(s, data):
         #end if
     #end def
     
+    elif command == "!abrasive":
+        s.msg(channel, "ABRASIVE - PepePls puu.sh/F2ADg/dbbae5e308.mp3 PepePls")
+    
+    elif command == "!mimic" or command == "!nico":
+        nicos = {"https://i.imgur.com/V514bG3.jpg PunOko", 
+             "https://i.redd.it/5al3htpvlus01.gif PunOko 👉🚪",
+             "Reeeeeee  NICO Reeeeeee  NICO Reeeeeee  NO Reeeeeee",
+             "https://i.imgur.com/Db6wX1G.mp4 PunOko",
+             "https://youtu.be/PPRox5ExxHQ 🏎️"
+            }
+        s.msg(channel, random.choice(nicos))
+    
+    elif command == "!yuuki":
+        s.msg(channel, "BabyRage")
+    
+    elif command == "!seppuku":
+        s.msg(channel, "/timeout "+username+" 1")
+        s.msg(channel, "chewieSudoku")
+    
+    elif command == "!brenda":
+        s.msg(channel, "BRENDA -- http://imgur.com/9KYqgvS")
+    
+    elif command == "!omgHost":
+        s.msg(channel, "omgSide https://i.imgur.com/mW0XwxA.png omgHost")
+        
+    elif command == "summondan" and (userlevel <=  2 or username == "YuukiHatsu"):
+        s.msg(channel, "ヽ༼ຈل͜ຈ༽ﾉ Goose plucked and Yuuki ban, with this chant, I summon Dan ヽ༼ຈل͜ຈ༽ﾉ")
+        s.msg(channel, "/ban YuukiHatsu")
+        s.msg(channel, "/unban YuukiHatsu")
+    
+    elif command == "!berkut":
+        s.msg(channel, "is a butt BabyRage")
+    
+    elif command == "!ethy":
+        s.msg(channel, "ethy show cake BabyRage")
+        
+    elif command == "!meeb":
+        s.msg(channel, "oe omgBunny")
+    elif command == "!weeb":
+        s.msg(channel, "oe omgAyaya")
+    
+    elif command == "!nail" or command == "!nailcliper":
+        s.msg(channel, "nailcliLikeThis")
+    
+    elif command == "!nobody":
+        s.msg(channel, "nobody loves you FeelsBirthdayMan")
+        
+    elif command == "dreyer1" and username == "ayedannydre":
+        s.msg(channel, "/timeout "+username+" 1")
+    
+    elif (command == "!gloomy" or command == "!glooby") and userlevel <= 3 and channel == "itshafu":
+        if channels[channel].hosttarget or username == "gloomy___" or username == "mrabbod":
+            s.msg(channel, "omgSax omgSax omgSax")
+            s.msg(channel, "omgSax pepeDHaw omgSax")
+            s.msg(channel, "omgSax omgSax omgSax")
+        else:
+            s.msg(channel, "omgSax pepeDHaw omgSax")
+    
+    elif command == "!zap":
+        s.msg(channel, "https://i.imgur.com/FkcUOwx.png omgAyaya")
 #end def
