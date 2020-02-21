@@ -51,7 +51,6 @@ def parseData(line):
     while lines:
         message += ' ' + lines.pop(0)
     message = message[2:]
-    print(message[:7])
     if message[:7] == "ACTION":
         message = message[7:-1]
     data['message'] = message.split()
@@ -119,15 +118,21 @@ def processData(data):
 s.connect()
 
 while True:
-    while(len(s.RECV_QUEUE) > 0):
-        lines = s.RECV_QUEUE.pop().split('\r\n')
-        for line in lines:
-            if len(line) > 0:
-                data = {}
-                data = parseData(line)
-                #if(data['command'] != "JOIN" and data['command'] != "PART"):
-                print("<- " + line)
-                print("Data: \n",data,'\n')
-                
-                processData(data)
+    try:
+        while(len(s.RECV_QUEUE) > 0):
+            lines = s.RECV_QUEUE.pop().split('\r\n')
+            for line in lines:
+                if len(line) > 0:
+                    data = {}
+                    data = parseData(line)
+                    print("<- " + line)
+                    print("Data: \n",data,'\n')
+                    
+                    processData(data)
+    except Exception as e:
+        with open("errors.txt",'a') as f:
+            print(e)
+            f.write(str(e)+'\n')
+            f.close()
+        #end open
 #end while

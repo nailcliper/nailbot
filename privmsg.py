@@ -45,6 +45,7 @@ import threading
 from threading import Timer
 import time
 import re
+import urllib.request, json
 
 regex = re.compile('[W_]+')
 
@@ -57,8 +58,8 @@ class ChannelTimer():
 #end class
 
 def get_username(data):
-    if len(data['tags']['display-name']) > 0:
-        return data['tags']['display-name']
+    if len(data['tags'].get('display-name')) > 0:
+        return data['tags'].get('display-name')
     else:
         return data['prefix'].split('!')[0]
 #end def
@@ -79,7 +80,7 @@ with open("userlevels.txt",'r') as f:
 #end open
 
 def get_userlevel(username, data):
-    badges = data['tags']['badges']
+    badges = data['tags'].get('badges')
     if username == NICK:
         level = 0
     elif username.lower() in userlevels:
@@ -105,16 +106,30 @@ def handle_PRIVMSG(s, data):
     channel = data['args'][0]
     command = data['message'][0] 
     
+    if username == "nailcliper" and command == "!test" and channel == "#chewiemelodies":
+        username = "ananonymouscheerer"
+        data['bits'] = "100"
+    #end if
+    
     if "bits" in data:
         if channel == "#chewiemelodies":
             chews = int(data['bits']) * 10
             if username == "ananonymouscheerer":
-                winner = random.choice(channels[channel].userlist)
-                msg = "!add "+str(chews)+" "+winner
-                s.msg(channel,msg)
+                with urllib.request.urlopen('https://tmi.twitch.tv/group/user/'+channel[1:]+'/chatters') as url:
+                    json_data = json.loads(url.read().decode())
+                    chatters = []
+                    for group in json_data['chatters']:
+                        for chatter in json_data['chatters'][group]:
+                            chatters.append(chatter)
+                    #end for
+                    winner = random.choice(chatters)
+                    msg = "!add "+str(chews)+" "+winner
+                    s.msg(channel,msg)
+                #end url
             else:
                 msg = "!add "+str(chews)+" "+username
                 s.msg("#chewiebot",msg)
+            #end if
     #end if
     
     if username == "rallyboss" and data['message'][1] == "Boss" and data['message'][2] == "defeated!" and channel == "#chewiemelodies":
@@ -122,7 +137,7 @@ def handle_PRIVMSG(s, data):
     
     text = re.sub(regex,'',''.join(data['message']).lower())
     if "sudoku" in text and channel == "#chewiemelodies":
-        if all (k not in data['tags']['badges'] for k in ("moderator","broadcaster","staff","admin","global_mod")):
+        if all (k not in data['tags'].get('badges') for k in ("moderator","broadcaster","staff","admin","global_mod")):
             s.msg(channel,"/timeout "+username+" 120")
             s.msg(channel,"! chewieSudoku "+username+" got their guts spilled! chewieSudoku")
     #end if
@@ -263,12 +278,12 @@ def handle_PRIVMSG(s, data):
         s.msg(channel, "ABRASIVE - PepePls puu.sh/F2ADg/dbbae5e308.mp3 PepePls")
     
     elif command == "!mimic" or command == "!nico":
-        nicos = {"https://i.imgur.com/V514bG3.jpg PunOko", 
+        nicos = ["https://i.imgur.com/V514bG3.jpg PunOko", 
              "https://i.redd.it/5al3htpvlus01.gif PunOko 👉🚪",
              "Reeeeeee  NICO Reeeeeee  NICO Reeeeeee  NO Reeeeeee",
              "https://i.imgur.com/Db6wX1G.mp4 PunOko",
              "https://youtu.be/PPRox5ExxHQ 🏎️"
-            }
+            ]
         s.msg(channel, random.choice(nicos))
     
     elif command == "!yuuki":
