@@ -132,7 +132,7 @@ while True:
                     processData(data)
     except Exception as e:
         with open("traceback.txt",'a') as f:
-            err = traceback.format_exec()
+            err = traceback.format_exc()
             print(err)
             f.write(err+'\n\n','a')
             f.close()

@@ -11,6 +11,7 @@ class Channel:
     subbuffer = 0
     subcount = 0
     userlist = set()
+    timer = None
 #end class
 
 variables = {}

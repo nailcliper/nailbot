@@ -55,7 +55,6 @@ class ChannelTimer():
     timer = None
     set_time = None
     start_time = None
-    running = False
 #end class
 
 def get_username(data):
@@ -99,7 +98,7 @@ def get_userlevel(username, data):
 
 def timeup(s,channel,message):
     s.msg(channel,message)
-    timers[channel].running = False
+    channels[channel].timer = None
 
 def handle_PRIVMSG(s, data):
     username = get_username(data)
@@ -186,13 +185,14 @@ def handle_PRIVMSG(s, data):
     #end if
     
     elif command == "!timer" and userlevel <= 2:
-        if channel in timers and timers[channel].running:
+        if channels[channel].timer:
+            timer = channels[channel].timer
             if len(data['message']) >= 2 and data['message'][1] == "stop":
-                timers[channel].timer.cancel()
-                timers[channel].running = False
+                timer.cancel()
+                channels[channel].timer = None
                 s.msg(channel,"Timer Stopped")
             else:
-                elapsed_time = int(timers[channel].set_time - (time.time() - timers[channel].start_time))
+                elapsed_time = int(timer.set_time - (time.time() - timer.start_time))
                 seconds = elapsed_time % 60
                 elapsed_time = elapsed_time // 60
                 minutes = elapsed_time % 60
@@ -216,12 +216,12 @@ def handle_PRIVMSG(s, data):
                     set_time *= 3600
             #end if
             msg = "BongoPenguin Time Up! BongoPenguin"
-            timers[channel] = ChannelTimer()
-            timers[channel].timer = Timer(set_time,timeup,(s,channel,msg))
-            timers[channel].timer.start()
-            timers[channel].start_time = time.time()
-            timers[channel].set_time = set_time
-            timers[channel].running = True
+            timer = ChannelTimer()
+            timer = Timer(set_time,timeup,(s,channel,msg))
+            timer.start()
+            timer.start_time = time.time()
+            timer.set_time = set_time
+            channels[channel].timer = timer
             
             seconds = set_time % 60
             set_time = set_time // 60
