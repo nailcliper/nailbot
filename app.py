@@ -54,7 +54,8 @@ def parseData(line):
     message = message[2:]
     if message[:7] == "ACTION":
         message = message[7:-1]
-    data['message'] = message.split()
+    data['message'] = message
+    data['tokens'] = message.split()
     
     return data
 #end def
@@ -127,7 +128,7 @@ while True:
                     data = {}
                     data = parseData(line)
                     print("<- " + line)
-                    print("Data: \n",data,'\n')
+                    #print("Data: \n",data,'\n')
                     
                     processData(data)
     except Exception as e:

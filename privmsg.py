@@ -104,7 +104,8 @@ def handle_PRIVMSG(s, data):
     username = get_username(data)
     userlevel = get_userlevel(username, data)
     channel = data['args'][0]
-    command = data['message'][0] 
+    tokens = data['tokens']
+    command = tokens[0]
     
     if "bits" in data:
         if channel == "#chewiemelodies":
@@ -127,10 +128,10 @@ def handle_PRIVMSG(s, data):
             #end if
     #end if
     
-    if username == "rallyboss" and data['message'][1] == "Boss" and data['message'][2] == "defeated!" and channel == "#chewiemelodies":
-        s.msg(channel, "!add 5000 "+data['message'][18])
+    if username == "rallyboss" and tokens[1] == "Boss" and tokens[2] == "defeated!" and channel == "#chewiemelodies":
+        s.msg(channel, "!add 5000 "+tokens[18])
     
-    text = re.sub(regex,'',''.join(data['message']).lower())
+    text = re.sub(regex,'',data['message'].lower())
     if "sudoku" in text and channel == "#chewiemelodies":
         if all (k not in data['tags'].get('badges') for k in ("moderator","broadcaster","staff","admin","global_mod")):
             timeout = Timer(0.1,s.msg,(channel,"/timeout "+username+" 120"))
@@ -139,11 +140,11 @@ def handle_PRIVMSG(s, data):
             s.msg(channel,"! chewieSudoku "+username+" got their guts spilled! chewieSudoku")
     #end if
     
-    elif "yuuki mod" in ' '.join(data['message']).lower() and userlevel <= 3:
+    elif ("yuuki mod" in data['message'].lower() or "yuukihatsu mod" in data['message'].lower()) and userlevel <= 3:
         s.msg(channel,"WutFace")
     
-    if command == "!count" and data['message'][1]:
-        key = "count_"+data['message'][1]
+    if command == "!count" and tokens[1]:
+        key = "count_"+tokens[1]
         if key in variables:
             msg = variables[key]
             if key == "river":
@@ -153,8 +154,8 @@ def handle_PRIVMSG(s, data):
             s.msg(channel, msg)
     #end  if
     
-    elif command == "!countadd" and data['message'][1] and userlevel <= 3:
-        key = "count_"+data['message'][1]
+    elif command == "!countadd" and len(tokens) > 1 and userlevel <= 3:
+        key = "count_"+tokens[1]
         if key in variables:
             variables[key] = str(int(variables[key])+1)
         else:
@@ -172,8 +173,8 @@ def handle_PRIVMSG(s, data):
         s.msg(channel, variables[key])
     #end if
     
-    elif command == "!countsub" and data['message'][1] and userlevel <= 3:
-        key = "count_"+data['message'][1]
+    elif command == "!countsub" and len(tokens) > 1 and userlevel <= 3:
+        key = "count_"+tokens[1]
         if key in variables:
             variables[key] = str(int(variables[key])-1)
             with open("variables.txt",'w') as f:
@@ -187,7 +188,7 @@ def handle_PRIVMSG(s, data):
     elif command == "!timer" and userlevel <= 2:
         if channels[channel].timer:
             timer = channels[channel].timer
-            if len(data['message']) >= 2 and data['message'][1] == "stop":
+            if len(tokens) >= 2 and tokens[1] == "stop":
                 timer.cancel()
                 channels[channel].timer = None
                 s.msg(channel,"Timer Stopped")
@@ -207,12 +208,12 @@ def handle_PRIVMSG(s, data):
                     msg += str(seconds)+"s"
                 s.msg(channel, msg)
             #end if
-        elif len(data['message']) >= 2 and data['message'][1].isnumeric() :
-            set_time = int(data['message'][1])
-            if len(data['message']) >= 3:
-                if data['message'][2] == 'm':
+        elif len(tokens) >= 2 and tokens[1].isnumeric() :
+            set_time = int(tokens[1])
+            if len(tokens) >= 3:
+                if tokens[2] == 'm':
                     set_time *= 60
-                elif data['message'][2] == 'h':
+                elif tokens[2] == 'h':
                     set_time *= 3600
             #end if
             msg = "BongoPenguin Time Up! BongoPenguin"
@@ -241,9 +242,9 @@ def handle_PRIVMSG(s, data):
     
     elif command == "!host" and userlevel <= 5 and channels[channel].hosttarget:
         msg = ''
-        if len(data['message']) >= 2 and userlevel <= 3:
-            if data['message'][1][0] == '@':
-                msg += data['message'][1]
+        for token in tokens:
+            if token[1][0] == '@':
+                msg += token
         #end if
         if channel == "#itshafu":
             msg += "This is still Hafu's chat, to talk to " + channels[channel].hosttarget + " please visit twitch.tv/" + channels[channel].hosttarget + " omgLurk"
