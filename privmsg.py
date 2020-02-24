@@ -48,6 +48,7 @@ import re
 import urllib.request, json
 
 regex = re.compile('[W_]+')
+regex_bounus = re.compile('(bonus)[0-9]+')
 
 timers = {}
 class ChannelTimer():
@@ -106,11 +107,6 @@ def handle_PRIVMSG(s, data):
     channel = data['args'][0]
     command = data['message'][0] 
     
-    if username == "nailcliper" and command == "!test" and channel == "#chewiemelodies":
-        username = "ananonymouscheerer"
-        data['bits'] = "100"
-    #end if
-    
     if "bits" in data:
         if channel == "#chewiemelodies":
             chews = int(data['bits']) * 10
@@ -138,7 +134,9 @@ def handle_PRIVMSG(s, data):
     text = re.sub(regex,'',''.join(data['message']).lower())
     if "sudoku" in text and channel == "#chewiemelodies":
         if all (k not in data['tags'].get('badges') for k in ("moderator","broadcaster","staff","admin","global_mod")):
-            s.msg(channel,"/timeout "+username+" 120")
+            timeout = Timer(0.1,s.msg,(channel,"/timeout "+username+" 120"))
+            timeout.start()
+            #s.msg(channel,"/timeout "+username+" 120")
             s.msg(channel,"! chewieSudoku "+username+" got their guts spilled! chewieSudoku")
     #end if
     
@@ -316,7 +314,7 @@ def handle_PRIVMSG(s, data):
         s.msg(channel, "oe omgAyaya")
     
     elif command == "!nail" or command == "!nailcliper":
-        s.msg(channel, "nailcliLikeThis")
+        s.msg(channel, "nailclLikeThis ")
     
     elif command == "!nobody":
         s.msg(channel, "nobody loves you FeelsBirthdayMan")

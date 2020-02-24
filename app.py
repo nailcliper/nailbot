@@ -1,3 +1,4 @@
+import traceback
 from twitch_socket import s
 from globals import NICK, PASS, CHAN
 from notice import handle_NOTICE
@@ -111,7 +112,7 @@ def processData(data):
     #PING: The server will send you a PING :tmi.twitch.tv. 
     #      To ensure that your connection to the server is not prematurely terminated, reply with PONG :tmi.twitch.tv.
     elif command == "PING":
-        s.send("PONG :tmi.twitch.tv")
+        s.send_front("PONG :tmi.twitch.tv")
 
 #end def
 
@@ -130,9 +131,10 @@ while True:
                     
                     processData(data)
     except Exception as e:
-        with open("errors.txt",'a') as f:
-            print(e)
-            f.write(str(e)+'\n')
+        with open("traceback.txt",'a') as f:
+            err = traceback.format_exec()
+            print(err)
+            f.write(err+'\n\n','a')
             f.close()
         #end open
 #end while

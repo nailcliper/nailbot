@@ -28,7 +28,7 @@ def handle_USERNOTICE(s, data):
     channel = data['args'][0]
     
     key = data['tags'].get('msg-id')
-    months = int(data['tags'].get('msg-param-cumulative-months',0))
+    months = int(data['tags'].get('msg-param-cumulative-months',data['tags'].get('msg-param-months',0)))
     username = data['tags'].get('login')
     plan = data['tags'].get('msg-param-sub-plan')
     gift = data['tags'].get('msg-param-recipient-user-name')

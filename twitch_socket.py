@@ -65,6 +65,9 @@ class Socket:
     
     def send(self, m):
         self.SEND_QUEUE.append(m)
+        
+    def send_front(self,m):
+        self.SEND_QUEUE.insert(0,m)
     
     def msg(self, channel, message):
         m = "PRIVMSG " + channel + " :" + message
