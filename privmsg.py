@@ -48,7 +48,7 @@ import re
 import urllib.request, json
 
 regex = re.compile('[W_]+')
-regex_bounus = re.compile('(bonus)[0-9]+')
+regex_bonus = re.compile('bonus[0-9]+')
 
 timers = {}
 class ChannelTimer():
@@ -107,25 +107,36 @@ def handle_PRIVMSG(s, data):
     tokens = data['tokens']
     command = tokens[0]
     
-    if "bits" in data:
+    if "bits" in data['tags']:
         if channel == "#chewiemelodies":
-            chews = int(data['bits']) * 10
+            chews = int(data['tags'].get('bits')) * 10
+            chatters = []
+            with urllib.request.urlopen('https://tmi.twitch.tv/group/user/'+channel[1:]+'/chatters') as url:
+                json_data = json.loads(url.read().decode())
+                for group in json_data['chatters']:
+                    for chatter in json_data['chatters'][group]:
+                        chatters.append(chatter)
+                #end for
+            #end url
+            winner = random.choice(chatters)
             if username == "ananonymouscheerer":
-                with urllib.request.urlopen('https://tmi.twitch.tv/group/user/'+channel[1:]+'/chatters') as url:
-                    json_data = json.loads(url.read().decode())
-                    chatters = []
-                    for group in json_data['chatters']:
-                        for chatter in json_data['chatters'][group]:
-                            chatters.append(chatter)
-                    #end for
-                    winner = random.choice(chatters)
-                    msg = "!add "+str(chews)+" "+winner
-                    s.msg(channel,msg)
-                #end url
+                msg = "!add "+str(chews)+" "+winner
+                s.msg(channel,msg)
+            
             else:
                 msg = "!add "+str(chews)+" "+username
                 s.msg("#chewiebot",msg)
             #end if
+            
+            bonus = re.findall(regex_bonus, data['message'])
+            print("bonus:",bonus)
+            if bonus:
+                bonus_bits = int(bonus[0][5:])
+                msg = "!add "+str(bonus_bits)+" "+winner
+                s.msg(channel,msg)
+            #end if
+            
+            print('\n\n',chatters,'\n\n')
     #end if
     
     if username == "rallyboss" and tokens[1] == "Boss" and tokens[2] == "defeated!" and channel == "#chewiemelodies":

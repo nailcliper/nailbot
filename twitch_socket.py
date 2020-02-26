@@ -57,7 +57,7 @@ class Socket:
                 while len(self.SEND_QUEUE) > 0:
                     message = self.SEND_QUEUE.pop(0)
                     self.s.send(bytes(message + '\r\n',"UTF-8"))
-                    print("-> " + message + '\n')
+                    print("-> " + message)
             except self.s.error:
                 self.connected = False
                 self.reconnect()

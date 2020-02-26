@@ -135,7 +135,7 @@ while True:
         with open("traceback.txt",'a') as f:
             err = traceback.format_exc()
             print(err)
-            f.write(err+'\n\n','a')
+            f.write(err+'\n--\n\n')
             f.close()
         #end open
 #end while
