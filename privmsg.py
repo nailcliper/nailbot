@@ -45,7 +45,6 @@ import threading
 from threading import Timer
 import time
 import re
-import urllib.request, json
 
 regex = re.compile('[W_]+')
 regex_bonus = re.compile('bonus[0-9]+')
@@ -106,19 +105,14 @@ def handle_PRIVMSG(s, data):
     channel = data['args'][0]
     tokens = data['tokens']
     command = tokens[0]
-    
+
     if "bits" in data['tags']:
         if channel == "#chewiemelodies":
             chews = int(data['tags'].get('bits')) * 10
-            chatters = []
-            with urllib.request.urlopen('https://tmi.twitch.tv/group/user/'+channel[1:]+'/chatters') as url:
-                json_data = json.loads(url.read().decode())
-                for group in json_data['chatters']:
-                    for chatter in json_data['chatters'][group]:
-                        chatters.append(chatter)
-                #end for
-            #end url
+            userlist = channels[channel].get_userlist()
+            chatters = list({x for v in userlist.values() for x in v})
             winner = random.choice(chatters)
+            
             if username == "ananonymouscheerer":
                 msg = "!add "+str(chews)+" "+winner
                 s.msg(channel,msg)
@@ -309,10 +303,12 @@ def handle_PRIVMSG(s, data):
     elif command == "!omgHost":
         s.msg(channel, "omgSide https://i.imgur.com/mW0XwxA.png omgHost")
         
-    elif command == "summondan" and (userlevel <=  2 or username == "YuukiHatsu"):
-        s.msg(channel, "ヽ༼ຈل͜ຈ༽ﾉ Goose plucked and Yuuki ban, with this chant, I summon Dan ヽ༼ຈل͜ຈ༽ﾉ")
-        s.msg(channel, "/ban YuukiHatsu")
-        s.msg(channel, "/unban YuukiHatsu")
+    elif command == "!summondan" and (userlevel <=  2 or username == "YuukiHatsu"):
+        userlist = channels[channel].get_userlist()
+        if "yuukihatsu" not in userlist['moderators']:
+            s.msg(channel, "ヽ༼ຈل͜ຈ༽ﾉ Goose plucked and Yuuki ban, with this chant, I summon Dan ヽ༼ຈل͜ຈ༽ﾉ")
+            s.msg(channel, "/ban YuukiHatsu")
+            s.msg(channel, "/unban YuukiHatsu")
     
     elif command == "!berkut":
         s.msg(channel, "is a butt BabyRage")

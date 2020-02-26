@@ -75,7 +75,7 @@ class Socket:
 
     def join_channel(self, channel):
         m = "JOIN " + channel
-        channels[channel] = Channel()
+        channels[channel] = Channel(channel)
         self.SEND_QUEUE.append(m)
 #end class
 
