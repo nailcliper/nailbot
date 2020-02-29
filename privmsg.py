@@ -83,7 +83,7 @@ def get_userlevel(username, data):
     if username == NICK:
         level = 0
     elif username.lower() in userlevels:
-        level = userlevels[username.lower()]
+        level = int(userlevels[username.lower()])
     elif 'broadcaster' in badges:
         level = 1
     elif 'moderator' in badges:
@@ -248,8 +248,8 @@ def handle_PRIVMSG(s, data):
     elif command == "!host" and userlevel <= 5 and channels[channel].hosttarget:
         msg = ''
         for token in tokens:
-            if token[1][0] == '@':
-                msg += token
+            if token[0] == '@':
+                msg += token + ' '
         #end if
         if channel == "#itshafu":
             msg += "This is still Hafu's chat, to talk to " + channels[channel].hosttarget + " please visit twitch.tv/" + channels[channel].hosttarget + " omgLurk"
