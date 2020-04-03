@@ -123,14 +123,14 @@ def handle_PRIVMSG(s, data):
             #end if
             
             bonus = re.findall(regex_bonus, data['message'])
-            print("bonus:",bonus)
+            #print("bonus:",bonus)
             if bonus:
                 bonus_bits = int(bonus[0][5:])
                 msg = "!add "+str(bonus_bits)+" "+winner
                 s.msg(channel,msg)
             #end if
             
-            print('\n\n',chatters,'\n\n')
+            #print('\n\n',chatters,'\n\n')
     #end if
     
     if username == "rallyboss" and tokens[1] == "Boss" and tokens[2] == "defeated!" and channel == "#chewiemelodies":
@@ -245,7 +245,7 @@ def handle_PRIVMSG(s, data):
         #end if
     #end if
     
-    elif command == "!host" and userlevel <= 5 and channels[channel].hosttarget:
+    elif command == "!host" and userlevel < 5 and channels[channel].hosttarget:
         msg = ''
         for token in tokens:
             if token[0] == '@':
@@ -303,12 +303,12 @@ def handle_PRIVMSG(s, data):
     elif command == "!omgHost":
         s.msg(channel, "omgSide https://i.imgur.com/mW0XwxA.png omgHost")
         
-    elif command == "!summondan" and (userlevel <=  2 or username == "YuukiHatsu"):
-        userlist = channels[channel].get_userlist()
-        if "yuukihatsu" not in userlist['moderators']:
-            s.msg(channel, "ヽ༼ຈل͜ຈ༽ﾉ Goose plucked and Yuuki ban, with this chant, I summon Dan ヽ༼ຈل͜ຈ༽ﾉ")
-            s.msg(channel, "/ban YuukiHatsu")
-            s.msg(channel, "/unban YuukiHatsu")
+    #elif command == "!summondan" and (userlevel <=  2 or username == "YuukiHatsu"):
+    #    userlist = channels[channel].get_userlist()
+    #    if "yuukihatsu" not in userlist['moderators']:
+    #        s.msg(channel, "ヽ༼ຈل͜ຈ༽ﾉ Goose plucked and Yuuki ban, with this chant, I summon Dan ヽ༼ຈل͜ຈ༽ﾉ")
+    #        s.msg(channel, "/ban YuukiHatsu")
+    #        s.msg(channel, "/unban YuukiHatsu")
     
     elif command == "!berkut":
         s.msg(channel, "is a butt BabyRage")
@@ -330,10 +330,10 @@ def handle_PRIVMSG(s, data):
     elif command == "dreyer1" and username == "ayedannydre":
         s.msg(channel, "/timeout "+username+" 1")
     
-    elif (command == "!gloomy" or command == "!glooby") and userlevel <= 3 and channel == "itshafu":
-        if channels[channel].hosttarget or username == "gloomy___" or username == "mrabbod":
+    elif (command == "!gloomy" or command == "!glooby") and userlevel <= 3 and channel == "#itshafu":
+        if channels[channel].hosttarget or username == "gloomy___" or userlevel <= 2 or username == "mrabbod":
             s.msg(channel, "omgSax omgSax omgSax")
-            s.msg(channel, "omgSax pepeDHaw omgSax")
+            s.msg(channel, "omgSax pepeD omgSax")
             s.msg(channel, "omgSax omgSax omgSax")
         else:
             s.msg(channel, "omgSax pepeDHaw omgSax")

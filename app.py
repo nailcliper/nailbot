@@ -8,6 +8,7 @@ from join import handle_JOIN
 from part import handle_PART
 from names import handle_NAMES
 from hosttarget import handle_HOSTTARGET
+import time
 
 def parseData(line):
     data = {}
@@ -120,22 +121,27 @@ def processData(data):
 s.connect()
 
 while True:
+    curline = ''
     try:
         while(len(s.RECV_QUEUE) > 0):
             lines = s.RECV_QUEUE.pop().split('\r\n')
             for line in lines:
+                curline = line
                 if len(line) > 0:
                     data = {}
                     data = parseData(line)
-                    print("<- " + line)
+                    #print("<- " + line)
                     #print("Data: \n",data,'\n')
                     
                     processData(data)
+            
     except Exception as e:
         with open("traceback.txt",'a') as f:
             err = traceback.format_exc()
             print(err)
             f.write(err+'\n--\n\n')
+            f.write(curline+'\n')
             f.close()
         #end open
+    time.sleep(0.1)
 #end while
