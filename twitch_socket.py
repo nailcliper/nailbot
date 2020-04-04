@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 from globals import NICK, PASS, CHAN, channels, Channel
 
 class Socket:
@@ -49,6 +50,7 @@ class Socket:
             except self.s.error:
                 self.connected = False
                 self.reconnect()
+            time.sleep(0.1)
     #end def
     
     def send_all(self):
@@ -61,6 +63,7 @@ class Socket:
             except self.s.error:
                 self.connected = False
                 self.reconnect()
+            time.sleep(0.1)
     #end def
     
     def send(self, m):
